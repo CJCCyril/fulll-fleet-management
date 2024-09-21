@@ -1,0 +1,8 @@
+services:
+  fulll-fleet-management-php:
+    container_name: fulll-fleet-management-php
+    build:
+      context: ./
+    volumes:
+      - ./:/app
+    working_dir: /app
