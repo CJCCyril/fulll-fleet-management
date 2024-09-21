@@ -1,0 +1,12 @@
+default:
+  suites:
+    register:
+      contexts:
+        - App\Infrastructure\Behat\RegisterVehicleContext
+      paths:
+        - tests/Behat/Vehicle/register_vehicle.feature
+    park:
+      contexts:
+        - App\Infrastructure\Behat\ParkVehicleContext
+      paths:
+        - tests/Behat/Vehicle/park_vehicle.feature
