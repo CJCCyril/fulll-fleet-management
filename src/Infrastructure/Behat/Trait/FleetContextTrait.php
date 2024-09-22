@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Behat\Trait;
 
+use App\Application\Command\CreateFleetCommand;
+use App\Application\Command\CreateFleetCommandHandler;
+use App\Domain\Model\Fleet;
+
 trait FleetContextTrait
 {
+    private Fleet $currentFleet;
+    private Fleet $anotherFleet;
+
+    private CreateFleetCommandHandler $createFleetCommandHandler;
+
     /**
      * @Given my fleet
      */
     public function myFleet(): void
     {
-    }
+        $command = new CreateFleetCommand('currentUser');
 
-    /**
-     * @When I register this vehicle into my fleet
-     * @Given I have registered this vehicle into my fleet
-     */
-    public function iRegisterThisVehicleIntoMyFleet(): void
-    {
+        $this->currentFleet = ($this->createFleetCommandHandler)($command);
     }
 
     /**
@@ -26,12 +30,8 @@ trait FleetContextTrait
      */
     public function theFleetOfAnotherUser(): void
     {
-    }
+        $command = new CreateFleetCommand('anotherUser');
 
-    /**
-     * @Given this vehicle has been registered into the other user's fleet
-     */
-    public function thisVehicleHasBeenRegisteredIntoTheOtherUserFleet(): void
-    {
+        $this->anotherFleet = ($this->createFleetCommandHandler)($command);
     }
 }
