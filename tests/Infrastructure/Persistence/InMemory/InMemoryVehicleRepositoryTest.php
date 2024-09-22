@@ -2,6 +2,7 @@
 
 namespace App\Tests\Infrastructure\Persistence\InMemory;
 
+use App\Domain\Model\Fleet;
 use App\Domain\Model\Vehicle;
 use App\Infrastructure\Persistence\InMemory\DuplicateEntryException;
 use App\Infrastructure\Persistence\InMemory\InMemoryDatabase;
@@ -16,6 +17,7 @@ use function sprintf;
 #[CoversClass(InMemoryVehicleRepository::class)]
 #[CoversClass(DuplicateEntryException::class)]
 #[UsesClass(Vehicle::class)]
+#[UsesClass(Fleet::class)]
 final class InMemoryVehicleRepositoryTest extends TestCase
 {
     private InMemoryVehicleRepository $repository;
@@ -65,5 +67,29 @@ final class InMemoryVehicleRepositoryTest extends TestCase
         self::expectExceptionMessage($message);
 
         $this->repository->add($this->vehicle);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws DuplicateEntryException
+     */
+    public function testItCanUpdate(): void
+    {
+        $this->repository->add($this->vehicle);
+
+        $fleet = new Fleet('userId');
+
+        $this->vehicle->register($fleet);
+
+        $this->repository->update($this->vehicle);
+
+        $vehicle = $this->repository->findOneById($this->vehicle->getId());
+
+        self::assertNotNull($vehicle);
+
+        self::assertContains(
+            $fleet,
+            $vehicle->getFleets(),
+        );
     }
 }
