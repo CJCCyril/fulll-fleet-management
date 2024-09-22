@@ -8,7 +8,8 @@ use App\Domain\Model\Vehicle;
 
 /**
  * @extends WriteRepository<Vehicle>
+ * @extends ReadRepository<Vehicle>
  */
-interface VehicleRepository extends WriteRepository
+interface VehicleRepository extends WriteRepository, ReadRepository
 {
 }

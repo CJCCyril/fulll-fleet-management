@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\InMemory;
 
 use App\Domain\Model\Identifiable;
 use App\Domain\Model\Vehicle;
+use App\Domain\Repository\T;
 use App\Domain\Repository\VehicleRepository;
 use ReflectionException;
 
@@ -48,7 +49,12 @@ final readonly class InMemoryVehicleRepository extends EntityRepository implemen
         $this->insert($entity);
     }
 
-    public function findOneByPlateNumber(string $plateNumber): Vehicle|null
+    public function findOneById(int $id): Vehicle|null
+    {
+        return $this->find($id);
+    }
+
+    private function findOneByPlateNumber(string $plateNumber): Vehicle|null
     {
         foreach ($this->all() as $vehicle) {
             if ($plateNumber === $vehicle->getPlateNumber()) {

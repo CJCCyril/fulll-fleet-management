@@ -36,7 +36,7 @@ final class InMemoryFleetRepositoryTest extends TestCase
     {
         $this->repository->add($this->fleet);
 
-        $fleet = $this->repository->findOneByUserId($this->fleet->getUserId());
+        $fleet = $this->repository->findOneById($this->fleet->getId());
 
         self::assertEquals(
             $this->fleet,

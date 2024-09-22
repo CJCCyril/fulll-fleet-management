@@ -36,7 +36,7 @@ final class InMemoryVehicleRepositoryTest extends TestCase
     {
         $this->repository->add($this->vehicle);
 
-        $vehicle = $this->repository->findOneByPlateNumber($this->vehicle->getPlateNumber());
+        $vehicle = $this->repository->findOneById($this->vehicle->getId());
 
         self::assertEquals(
             $this->vehicle,

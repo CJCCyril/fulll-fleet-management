@@ -42,6 +42,16 @@ abstract readonly class EntityRepository
     }
 
     /**
+     * @param positive-int $id
+     *
+     * @return T|null
+     */
+    protected function find(int $id): Identifiable|null
+    {
+        return $this->all()[$id] ?? null;
+    }
+
+    /**
      * @return T[]
      */
     protected function all(): array

@@ -48,7 +48,12 @@ final readonly class InMemoryFleetRepository extends EntityRepository implements
         $this->insert($entity);
     }
 
-    public function findOneByUserId(string $userId): Fleet|null
+    public function findOneById(int $id): Fleet|null
+    {
+        return $this->find($id);
+    }
+
+    private function findOneByUserId(string $userId): Fleet|null
     {
         foreach ($this->all() as $fleet) {
             if ($userId === $fleet->getUserId()) {
