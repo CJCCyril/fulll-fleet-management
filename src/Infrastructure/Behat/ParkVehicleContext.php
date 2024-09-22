@@ -18,9 +18,6 @@ use App\Infrastructure\Behat\Trait\ExceptionContextTrait;
 use App\Infrastructure\Behat\Trait\FleetContextTrait;
 use App\Infrastructure\Behat\Trait\LocationContextTrait;
 use App\Infrastructure\Behat\Trait\VehicleContextTrait;
-use App\Infrastructure\Persistence\InMemory\InMemoryFleetRepository;
-use App\Infrastructure\Persistence\InMemory\InMemoryLocationRepository;
-use App\Infrastructure\Persistence\InMemory\InMemoryVehicleRepository;
 use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
 
@@ -34,23 +31,18 @@ final class ParkVehicleContext implements Context
     use LocationContextTrait;
     use VehicleContextTrait;
 
-    private ParkVehicleCommandHandler $parkVehicleCommandHandler;
-    private FindVehicleQueryHandler $findVehicleQueryHandler;
-
-    public function __construct()
-    {
-        $fleetRepository = new InMemoryFleetRepository();
-        $vehicleRepository = new InMemoryVehicleRepository();
-        $locationRepository = new InMemoryLocationRepository();
-
-        $this->createFleetCommandHandler = new CreateFleetCommandHandler($fleetRepository);
-
-        $this->createVehicleCommandHandler = new CreateVehicleCommandHandler($vehicleRepository);
-        $this->registerVehicleCommandHandler = new RegisterVehicleCommandHandler($vehicleRepository);
-        $this->parkVehicleCommandHandler = new ParkVehicleCommandHandler($vehicleRepository);
-        $this->findVehicleQueryHandler = new FindVehicleQueryHandler($vehicleRepository);
-
-        $this->createLocationCommandHandler = new CreateLocationCommandHandler($locationRepository);
+    public function __construct(
+        private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
+        private readonly ParkVehicleCommandHandler $parkVehicleCommandHandler,
+        CreateFleetCommandHandler $createFleetCommandHandler,
+        CreateVehicleCommandHandler $createVehicleCommandHandler,
+        RegisterVehicleCommandHandler $registerVehicleCommandHandler,
+        CreateLocationCommandHandler $createLocationCommandHandler,
+    ) {
+        $this->createFleetCommandHandler = $createFleetCommandHandler;
+        $this->createVehicleCommandHandler = $createVehicleCommandHandler;
+        $this->registerVehicleCommandHandler = $registerVehicleCommandHandler;
+        $this->createLocationCommandHandler = $createLocationCommandHandler;
     }
 
     /**

@@ -14,8 +14,6 @@ use App\Infrastructure\Behat\Trait\DatabaseContextTrait;
 use App\Infrastructure\Behat\Trait\ExceptionContextTrait;
 use App\Infrastructure\Behat\Trait\FleetContextTrait;
 use App\Infrastructure\Behat\Trait\VehicleContextTrait;
-use App\Infrastructure\Persistence\InMemory\InMemoryFleetRepository;
-use App\Infrastructure\Persistence\InMemory\InMemoryVehicleRepository;
 use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
 
@@ -28,17 +26,15 @@ final class RegisterVehicleContext implements Context
     use FleetContextTrait;
     use VehicleContextTrait;
 
-    private FindVehicleQueryHandler $findVehicleQueryHandler;
-
-    public function __construct()
-    {
-        $fleetRepository = new InMemoryFleetRepository();
-        $vehicleRepository = new InMemoryVehicleRepository();
-
-        $this->createFleetCommandHandler = new CreateFleetCommandHandler($fleetRepository);
-        $this->createVehicleCommandHandler = new CreateVehicleCommandHandler($vehicleRepository);
-        $this->registerVehicleCommandHandler = new RegisterVehicleCommandHandler($vehicleRepository);
-        $this->findVehicleQueryHandler = new FindVehicleQueryHandler($vehicleRepository);
+    public function __construct(
+        private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
+        CreateFleetCommandHandler $createFleetCommandHandler,
+        CreateVehicleCommandHandler $createVehicleCommandHandler,
+        RegisterVehicleCommandHandler $registerVehicleCommandHandler,
+    ) {
+        $this->createFleetCommandHandler = $createFleetCommandHandler;
+        $this->createVehicleCommandHandler = $createVehicleCommandHandler;
+        $this->registerVehicleCommandHandler = $registerVehicleCommandHandler;
     }
 
     /**
