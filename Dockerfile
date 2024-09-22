@@ -4,4 +4,4 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 RUN apk update && apk add --no-cache bash=5.2.26-r0
 RUN set -eux; \
-    install-php-extensions @composer
+    install-php-extensions @composer pdo_pgsql

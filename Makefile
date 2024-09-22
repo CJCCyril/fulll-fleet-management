@@ -4,6 +4,8 @@ PHP_CONT = $(DOCKER_COMP) exec fulll-fleet-management-php
 
 COMPOSER = $(PHP_CONT) composer
 
+SYMFONY = $(PHP_CONT) bin/console
+
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
@@ -23,7 +25,12 @@ bash: ## Connect to the php container
 
 first-start: build up ## Runs build up composer ci
 	@$(MAKE) composer c=install
+	@$(MAKE) database
+	@$(MAKE) database-test
 	@$(MAKE) ci
+
+kill-it-with-fire: down ## Use with caution: Cleanup all docker elements
+	docker system prune -a --volumes
 
 ## -- Composer ------------------------
 
@@ -58,4 +65,14 @@ ci: phpunit behat phpcs phpstan phpmd ## Runs phpunit behat phpcs phpstan phpmd
 
 sf: ## Runs sf console, Usage: make sf c=[command] | Example: make sf c=list
 	@$(eval c ?=)
-	@$(PHP_CONT) bin/console $(c)
+	@$(SYMFONY) $(c)
+
+database: ## Create the database
+	@$(SYMFONY) doctrine:database:drop --if-exists --force
+	@$(SYMFONY) doctrine:database:create
+	@$(SYMFONY) doctrine:schema:create
+
+database-test:
+	@$(SYMFONY) doctrine:database:drop --if-exists --force --env=test
+	@$(SYMFONY) doctrine:database:create --env=test
+	@$(SYMFONY) doctrine:schema:create --env=test
