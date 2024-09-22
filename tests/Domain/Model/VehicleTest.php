@@ -2,6 +2,8 @@
 
 namespace App\Tests\Domain\Model;
 
+use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use App\Domain\Model\Fleet;
 use App\Domain\Model\Vehicle;
 use App\Infrastructure\Persistence\IdSetter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -9,8 +11,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
+use function sprintf;
+
 #[CoversClass(Vehicle::class)]
 #[UsesClass(IdSetter::class)]
+#[UsesClass(Fleet::class)]
 final class VehicleTest extends TestCase
 {
     /**
@@ -52,5 +57,34 @@ final class VehicleTest extends TestCase
             $id,
             $this->vehicle->getId()
         );
+    }
+
+    public function testItCanAddFleet(): void
+    {
+        $fleet = new Fleet('userId');
+
+        $this->vehicle->register($fleet);
+
+        self::assertContains(
+            $fleet,
+            $this->vehicle->getFleets(),
+        );
+    }
+
+    public function testItThrowsVehicleAlreadyRegisteredException(): void
+    {
+        $fleet = new Fleet('userId');
+
+        self::expectException(VehicleAlreadyRegisteredException::class);
+
+        $message = sprintf(
+            'Vehicle "%s" is already registered.',
+            $this->vehicle->getPlateNumber(),
+        );
+
+        self::expectExceptionMessage($message);
+
+        $this->vehicle->register($fleet);
+        $this->vehicle->register($fleet);
     }
 }
