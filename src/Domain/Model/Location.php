@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace App\Domain\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
 final class Location implements Identifiable
 {
     use IdentifiableTrait;
 
+    #[ORM\Column(type: 'float')]
+    private readonly float $latitude;
+
+    #[ORM\Column(type: 'float')]
+    private readonly float $longitude;
+
     public function __construct(
-        private readonly float $latitude,
-        private readonly float $longitude,
+        float $latitude,
+        float $longitude,
     ) {
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
     }
 
     public function getLatitude(): float

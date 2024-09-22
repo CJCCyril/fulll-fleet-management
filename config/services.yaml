@@ -20,5 +20,10 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Domain\Repository\FleetRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineFleetRepository'
+    App\Domain\Repository\VehicleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineVehicleRepository'
+    App\Domain\Repository\LocationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineLocationRepository'
+
+#    App\Domain\Repository\FleetRepository: '@App\Infrastructure\Persistence\InMemory\InMemoryFleetRepository'
+#    App\Domain\Repository\VehicleRepository: '@App\Infrastructure\Persistence\InMemory\InMemoryVehicleRepository'
+#    App\Domain\Repository\LocationRepository: '@App\Infrastructure\Persistence\InMemory\InMemoryLocationRepository'

@@ -6,26 +6,46 @@ namespace App\Domain\Model;
 
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use ArrayAccess;
+use Countable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Traversable;
 
-use function in_array;
-
+#[ORM\Entity]
 final class Vehicle implements Identifiable
 {
     use IdentifiableTrait;
 
     /**
+     * @var non-empty-string
+     */
+    #[ORM\Column(type: 'string', unique: true)]
+    private readonly string $plateNumber;
+
+    /**
      * @var Fleet[]
      */
-    private array $fleets = [];
+    #[ORM\ManyToMany(
+        targetEntity: Fleet::class,
+        cascade: ['persist'],
+    )]
+    private iterable $fleets;
 
+    #[ORM\OneToOne(
+        targetEntity: Location::class,
+        cascade: ['persist'],
+    )]
     private Location|null $location = null;
 
     /**
      * @param non-empty-string $plateNumber
      */
     public function __construct(
-        private readonly string $plateNumber,
+        string $plateNumber,
     ) {
+        $this->plateNumber = $plateNumber;
+        $this->fleets = new ArrayCollection();
     }
 
     /**
@@ -48,10 +68,12 @@ final class Vehicle implements Identifiable
 
     public function register(Fleet $fleet): self
     {
-        if (in_array($fleet, $this->fleets, true)) {
+        //@phpstan-ignore method.nonObject (Doctrine collection)
+        if ($this->fleets->contains($fleet)) {
             throw new VehicleAlreadyRegisteredException($this->plateNumber);
         }
 
+        //@phpstan-ignore offsetAccess.nonOffsetAccessible (Doctrine collection)
         $this->fleets[] = $fleet;
 
         return $this;
