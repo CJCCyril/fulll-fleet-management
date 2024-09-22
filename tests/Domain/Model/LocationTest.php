@@ -51,4 +51,20 @@ final class LocationTest extends TestCase
             $this->location->getId()
         );
     }
+
+    public function testItCanBeCompared(): void
+    {
+        $location1 = new Location(
+            latitude: 43.455252,
+            longitude: 5.475261,
+        );
+
+        $location2 = new Location(
+            latitude: 43.446716,
+            longitude: 5.467333,
+        );
+
+        $this->assertFalse($location1->equalTo($location2));
+        $this->assertTrue($location1->equalTo($location1));
+    }
 }

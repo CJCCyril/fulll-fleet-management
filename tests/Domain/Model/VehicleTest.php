@@ -2,8 +2,10 @@
 
 namespace App\Tests\Domain\Model;
 
+use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
 use App\Domain\Model\Fleet;
+use App\Domain\Model\Location;
 use App\Domain\Model\Vehicle;
 use App\Infrastructure\Persistence\IdSetter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,6 +18,7 @@ use function sprintf;
 #[CoversClass(Vehicle::class)]
 #[UsesClass(IdSetter::class)]
 #[UsesClass(Fleet::class)]
+#[UsesClass(Location::class)]
 final class VehicleTest extends TestCase
 {
     /**
@@ -86,5 +89,54 @@ final class VehicleTest extends TestCase
 
         $this->vehicle->register($fleet);
         $this->vehicle->register($fleet);
+    }
+
+    public function testItCanBeParked(): void
+    {
+        $latitude = 43.455252;
+        $longitude = 5.475261;
+
+        $location = new Location(
+            latitude: $latitude,
+            longitude: $longitude,
+        );
+
+        $this->vehicle->park($location);
+
+        self::assertNotNull($this->vehicle->getLocation());
+
+        self::assertEquals(
+            [
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ],
+            [
+                'latitude' => $this->vehicle->getLocation()->getLatitude(),
+                'longitude' => $this->vehicle->getLocation()->getLongitude(),
+            ],
+        );
+    }
+
+    public function testItThrowsVehicleAlreadyParkedAtLocationException(): void
+    {
+        $latitude = 43.455252;
+        $longitude = 5.475261;
+
+        $location = new Location(
+            latitude: $latitude,
+            longitude: $longitude,
+        );
+
+        $this->vehicle->park($location);
+
+        self::expectException(VehicleAlreadyParkedAtLocationException::class);
+
+        $message = sprintf(
+            'Vehicle with id "%s" is already parked at location.',
+            $this->vehicle->getPlateNumber(),
+        );
+        self::expectExceptionMessage($message);
+
+        $this->vehicle->park($location);
     }
 }

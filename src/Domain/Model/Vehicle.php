@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Model;
 
+use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
 
 use function in_array;
@@ -52,6 +53,17 @@ final class Vehicle implements Identifiable
         }
 
         $this->fleets[] = $fleet;
+
+        return $this;
+    }
+
+    public function park(Location $location): self
+    {
+        if ($this->location?->equalTo($location)) {
+            throw new VehicleAlreadyParkedAtLocationException($this->plateNumber);
+        }
+
+        $this->location = $location;
 
         return $this;
     }

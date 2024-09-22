@@ -23,4 +23,14 @@ final class Location implements Identifiable
     {
         return $this->longitude;
     }
+
+    public function equalTo(Location $otherLocation): bool
+    {
+        $tolerance = 0.0001;
+
+        return
+            $this->getLatitude() - $otherLocation->getLatitude() < $tolerance &&
+            $this->getLongitude() - $otherLocation->getLongitude() < $tolerance
+        ;
+    }
 }

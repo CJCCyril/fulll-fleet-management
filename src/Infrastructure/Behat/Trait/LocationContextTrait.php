@@ -11,7 +11,7 @@ use App\Domain\Model\Location;
 trait LocationContextTrait
 {
     private Location $currentLocation;
-    private CreateLocationCommandHandler $createLocationCommand;
+    private CreateLocationCommandHandler $createLocationCommandHandler;
 
     /**
      * @Given a location
@@ -23,6 +23,6 @@ trait LocationContextTrait
             longitude: 5.475261,
         );
 
-        $this->currentLocation = ($this->createLocationCommand)($command);
+        $this->currentLocation = ($this->createLocationCommandHandler)($command);
     }
 }
