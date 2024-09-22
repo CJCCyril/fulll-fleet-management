@@ -54,3 +54,8 @@ phpmd: ## Runs php mess detector
 
 ci: phpunit behat phpcs phpstan phpmd ## Runs phpunit behat phpcs phpstan phpmd
 
+## -- Application ------------------------
+
+sf: ## Runs sf console, Usage: make sf c=[command] | Example: make sf c=list
+	@$(eval c ?=)
+	@$(PHP_CONT) bin/console $(c)
