@@ -6,7 +6,9 @@ namespace App\Application\Command;
 
 use App\Domain\Model\Location;
 use App\Domain\Repository\LocationRepository;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class CreateLocationCommandHandler
 {
     public function __construct(

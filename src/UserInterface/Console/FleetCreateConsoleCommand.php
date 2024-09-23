@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\UserInterface\Console;
 
+use App\Application\Command\CommandBusInterface;
 use App\Application\Command\CreateFleetCommand;
-use App\Application\Command\CreateFleetCommandHandler;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -23,7 +23,7 @@ class FleetCreateConsoleCommand extends Command
     private string|null $userId = null;
 
     public function __construct(
-        private readonly CreateFleetCommandHandler $createFleetCommandHandler,
+        private readonly CommandBusInterface $commandBus,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -63,7 +63,7 @@ class FleetCreateConsoleCommand extends Command
         $command = new CreateFleetCommand($this->userId);
 
         try {
-            $fleet = ($this->createFleetCommandHandler)($command);
+            $fleet = $this->commandBus->dispatch($command);
         } catch (UniqueConstraintViolationException $exception) {
             $output->writeln('<fg=red>Fleet already exist.</>');
 

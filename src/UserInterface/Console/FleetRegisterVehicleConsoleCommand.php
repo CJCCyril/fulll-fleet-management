@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\UserInterface\Console;
 
+use App\Application\Command\CommandBusInterface;
 use App\Application\Command\CreateVehicleCommand;
-use App\Application\Command\CreateVehicleCommandHandler;
 use App\Application\Command\RegisterVehicleCommand;
-use App\Application\Command\RegisterVehicleCommandHandler;
 use App\Application\Query\FindFleetQuery;
 use App\Application\Query\FindFleetQueryHandler;
 use App\Application\Query\FindVehicleByPlateNumberQuery;
@@ -27,7 +26,7 @@ use function is_string;
 class FleetRegisterVehicleConsoleCommand extends Command
 {
     /**
-     * @var positive-int
+     * @var positive-int|null
      */
     private int|null $fleetId = null;
 
@@ -37,10 +36,9 @@ class FleetRegisterVehicleConsoleCommand extends Command
     private string|null $vehiclePlateNumber = null;
 
     public function __construct(
+        private readonly CommandBusInterface $commandBus,
         private readonly FindFleetQueryHandler $findFleetQueryHandler,
         private readonly FindVehicleByPlateNumberQueryHandler $findVehicleByPlateNumber,
-        private readonly CreateVehicleCommandHandler $createVehicleCommandHandler,
-        private readonly RegisterVehicleCommandHandler $registerVehicleCommandHandler,
     ) {
         parent::__construct();
     }
@@ -111,7 +109,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
                 fleet: $fleet,
                 vehicle: $vehicle,
             );
-            ($this->registerVehicleCommandHandler)($command);
+            $this->commandBus->dispatch($command);
         } catch (VehicleAlreadyRegisteredException $exception) {
             $output->writeln(
                 sprintf('<fg=yellow>"%s"</>', $exception->getMessage())
@@ -134,7 +132,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
         } catch (MissingResourceException) {
             //@phpstan-ignore argument.type (Cannot be null at this point)
             $command = new CreateVehicleCommand($this->vehiclePlateNumber);
-            $vehicle = ($this->createVehicleCommandHandler)($command);
+            $vehicle = $this->commandBus->dispatch($command);
         }
 
         return $vehicle;

@@ -7,7 +7,10 @@ namespace App\Application\Command;
 use App\Domain\Model\Location;
 use App\Domain\Model\Vehicle;
 
-final readonly class ParkVehicleCommand
+/**
+ * @implements CommandInterface<void>
+ */
+final readonly class ParkVehicleCommand implements CommandInterface
 {
     public function __construct(
         public Location $location,

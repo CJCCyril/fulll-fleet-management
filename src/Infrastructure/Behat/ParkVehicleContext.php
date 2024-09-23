@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Behat;
 
-use App\Application\Command\CreateFleetCommandHandler;
-use App\Application\Command\CreateLocationCommandHandler;
-use App\Application\Command\CreateVehicleCommandHandler;
+use App\Application\Command\CommandBusInterface;
 use App\Application\Command\ParkVehicleCommand;
-use App\Application\Command\ParkVehicleCommandHandler;
-use App\Application\Command\RegisterVehicleCommandHandler;
 use App\Application\Query\FindVehicleQuery;
 use App\Application\Query\FindVehicleQueryHandler;
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
@@ -32,17 +28,9 @@ final class ParkVehicleContext implements Context
     use VehicleContextTrait;
 
     public function __construct(
+        private readonly CommandBusInterface $commandBus,
         private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
-        private readonly ParkVehicleCommandHandler $parkVehicleCommandHandler,
-        CreateFleetCommandHandler $createFleetCommandHandler,
-        CreateVehicleCommandHandler $createVehicleCommandHandler,
-        RegisterVehicleCommandHandler $registerVehicleCommandHandler,
-        CreateLocationCommandHandler $createLocationCommandHandler,
     ) {
-        $this->createFleetCommandHandler = $createFleetCommandHandler;
-        $this->createVehicleCommandHandler = $createVehicleCommandHandler;
-        $this->registerVehicleCommandHandler = $registerVehicleCommandHandler;
-        $this->createLocationCommandHandler = $createLocationCommandHandler;
     }
 
     /**
@@ -56,7 +44,7 @@ final class ParkVehicleContext implements Context
             vehicle: $this->currentVehicle,
         );
 
-        ($this->parkVehicleCommandHandler)($command);
+        $this->commandBus->dispatch($command);
     }
 
     /**

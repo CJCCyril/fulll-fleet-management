@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Behat;
 
+use App\Application\Command\CommandBusInterface;
 use App\Application\Command\CreateFleetCommandHandler;
 use App\Application\Command\CreateVehicleCommandHandler;
 use App\Application\Command\RegisterVehicleCommandHandler;
@@ -27,14 +28,9 @@ final class RegisterVehicleContext implements Context
     use VehicleContextTrait;
 
     public function __construct(
+        private readonly CommandBusInterface $commandBus,
         private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
-        CreateFleetCommandHandler $createFleetCommandHandler,
-        CreateVehicleCommandHandler $createVehicleCommandHandler,
-        RegisterVehicleCommandHandler $registerVehicleCommandHandler,
     ) {
-        $this->createFleetCommandHandler = $createFleetCommandHandler;
-        $this->createVehicleCommandHandler = $createVehicleCommandHandler;
-        $this->registerVehicleCommandHandler = $registerVehicleCommandHandler;
     }
 
     /**

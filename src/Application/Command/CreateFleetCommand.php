@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Command;
 
-final readonly class CreateFleetCommand
+use App\Domain\Model\Fleet;
+
+/**
+ * @implements CommandInterface<Fleet>
+ */
+final readonly class CreateFleetCommand implements CommandInterface
 {
     /**
      * @param non-empty-string $userId

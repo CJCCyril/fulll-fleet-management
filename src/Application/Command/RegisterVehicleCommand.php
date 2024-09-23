@@ -7,7 +7,10 @@ namespace App\Application\Command;
 use App\Domain\Model\Fleet;
 use App\Domain\Model\Vehicle;
 
-final readonly class RegisterVehicleCommand
+/**
+ * @implements CommandInterface<void>
+ */
+final readonly class RegisterVehicleCommand implements CommandInterface
 {
     public function __construct(
         public Fleet $fleet,

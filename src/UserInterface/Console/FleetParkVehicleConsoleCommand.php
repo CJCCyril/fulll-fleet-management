@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\UserInterface\Console;
 
+use App\Application\Command\CommandBusInterface;
 use App\Application\Command\ParkVehicleCommand;
-use App\Application\Command\ParkVehicleCommandHandler;
 use App\Application\Query\FindVehicleByPlateNumberQuery;
 use App\Application\Query\FindVehicleByPlateNumberQueryHandler;
 use App\Domain\Exception\MissingResourceException;
@@ -39,8 +39,8 @@ class FleetParkVehicleConsoleCommand extends Command
     private float|null|false $altitude = null;
 
     public function __construct(
+        private readonly CommandBusInterface $commandBus,
         private readonly FindVehicleByPlateNumberQueryHandler $findVehicleByPlateNumber,
-        private readonly ParkVehicleCommandHandler $parkVehicleCommandHandler,
     ) {
         parent::__construct();
     }
@@ -152,7 +152,7 @@ class FleetParkVehicleConsoleCommand extends Command
                 location: $location,
                 vehicle: $vehicle,
             );
-            ($this->parkVehicleCommandHandler)($command);
+            $this->commandBus->dispatch($command);
         } catch (VehicleAlreadyParkedAtLocationException $exception) {
             $output->writeln(
                 sprintf('<fg=yellow>"%s"</>', $exception->getMessage())

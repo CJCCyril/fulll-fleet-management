@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace App\Infrastructure\Behat\Trait;
 
 use App\Application\Command\CreateVehicleCommand;
-use App\Application\Command\CreateVehicleCommandHandler;
 use App\Application\Command\RegisterVehicleCommand;
-use App\Application\Command\RegisterVehicleCommandHandler;
 use App\Domain\Model\Vehicle;
 
 trait VehicleContextTrait
 {
     private Vehicle $currentVehicle;
-    private CreateVehicleCommandHandler $createVehicleCommandHandler;
-    private RegisterVehicleCommandHandler $registerVehicleCommandHandler;
 
     /**
      * @Given a vehicle
@@ -23,7 +19,7 @@ trait VehicleContextTrait
     {
         $command = new CreateVehicleCommand('GG-123-WP');
 
-        $this->currentVehicle = ($this->createVehicleCommandHandler)($command);
+        $this->currentVehicle = $this->commandBus->dispatch($command);
     }
 
     /**
@@ -37,7 +33,7 @@ trait VehicleContextTrait
             vehicle: $this->currentVehicle,
         );
 
-        ($this->registerVehicleCommandHandler)($command);
+        $this->commandBus->dispatch($command);
     }
 
     /**
@@ -50,6 +46,6 @@ trait VehicleContextTrait
             vehicle: $this->currentVehicle,
         );
 
-        ($this->registerVehicleCommandHandler)($command);
+        $this->commandBus->dispatch($command);
     }
 }
