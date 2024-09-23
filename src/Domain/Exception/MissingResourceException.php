@@ -19,7 +19,7 @@ final class MissingResourceException extends DomainException
         int|string $id,
     ) {
         $message = sprintf(
-            '"%s" with id "%d" not found.',
+            '"%s" with id "%s" not found.',
             $className,
             $id,
         );

@@ -57,6 +57,7 @@ final class LocationTest extends TestCase
         $location1 = new Location(
             latitude: 43.455252,
             longitude: 5.475261,
+            altitude: 10.0,
         );
 
         $location2 = new Location(

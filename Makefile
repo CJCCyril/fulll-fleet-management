@@ -76,3 +76,21 @@ database-test:
 	@$(SYMFONY) doctrine:database:drop --if-exists --force --env=test
 	@$(SYMFONY) doctrine:database:create --env=test
 	@$(SYMFONY) doctrine:schema:create --env=test
+
+## -- Application - Fleet ------------------------
+
+fleet-create: ## Create a new fleet | Usage: make fleet-create userId=[userId] | Example: make fleet-create userId=JohnDoe
+	@$(eval userId ?=)
+	@$(SYMFONY)	fleet:create $(userId)
+
+fleet-register-vehicle: ## Create or find and register a vehicle into the fleet | Usage: make fleet-register-vehicle fleetId=[fleetId] vehiclePlateNumber=[vehiclePlateNumber] | Example: make fleet-register-vehicle fleetId=1 vehiclePlateNumber=GG-123-WP
+	@$(eval fleetId ?=)
+	@$(eval vehiclePlateNumber ?=)
+	@$(SYMFONY)	fleet:register-vehicle $(fleetId) $(vehiclePlateNumber)
+
+fleet-park-vehicle: ## Park a vehicle to a location | Usage: make fleet-park-vehicle vehiclePlateNumber=[vehiclePlateNumber] lat=[lat] lng=[lng] (alt=[alt])| Example: make fleet-park-vehicle vehiclePlateNumber=GG-123-WP lat=43.455252 lng=5.475261
+	@$(eval vehiclePlateNumber ?=)
+	@$(eval lat ?=)
+	@$(eval lng ?=)
+	@$(eval alt ?=)
+	@$(SYMFONY)	fleet:park-vehicle $(vehiclePlateNumber) $(lat) $(lng) $(alt)
