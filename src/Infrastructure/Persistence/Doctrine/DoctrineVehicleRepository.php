@@ -26,6 +26,11 @@ final class DoctrineVehicleRepository extends ServiceEntityRepository implements
         return $this->find($id);
     }
 
+    public function findOneByPlateNumber(string $plateNumber): Vehicle|null
+    {
+        return $this->findOneBy(['plateNumber' => $plateNumber]);
+    }
+
     /**
      * @param Vehicle $entity
      */

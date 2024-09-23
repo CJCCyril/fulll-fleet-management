@@ -58,6 +58,9 @@ final class Vehicle implements Identifiable
         return $this->location;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getPlateNumber(): string
     {
         return $this->plateNumber;

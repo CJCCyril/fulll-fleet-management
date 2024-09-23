@@ -12,11 +12,11 @@ final class MissingResourceException extends DomainException
 {
     /**
      * @param class-string $className
-     * @param positive-int $id
+     * @param positive-int|non-empty-string $id
      */
     public function __construct(
         string $className,
-        int $id,
+        int|string $id,
     ) {
         $message = sprintf(
             '"%s" with id "%d" not found.',

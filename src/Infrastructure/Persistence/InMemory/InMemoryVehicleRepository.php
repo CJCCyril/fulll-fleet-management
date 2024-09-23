@@ -20,6 +20,22 @@ final readonly class InMemoryVehicleRepository extends EntityRepository implemen
         parent::__construct(Vehicle::class);
     }
 
+    public function findOneById(int $id): Vehicle|null
+    {
+        return $this->find($id);
+    }
+
+    public function findOneByPlateNumber(string $plateNumber): Vehicle|null
+    {
+        foreach ($this->all() as $vehicle) {
+            if ($plateNumber === $vehicle->getPlateNumber()) {
+                return $vehicle;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param Vehicle $entity
      */
@@ -47,21 +63,5 @@ final readonly class InMemoryVehicleRepository extends EntityRepository implemen
         }
 
         $this->insert($entity);
-    }
-
-    public function findOneById(int $id): Vehicle|null
-    {
-        return $this->find($id);
-    }
-
-    private function findOneByPlateNumber(string $plateNumber): Vehicle|null
-    {
-        foreach ($this->all() as $vehicle) {
-            if ($plateNumber === $vehicle->getPlateNumber()) {
-                return $vehicle;
-            }
-        }
-
-        return null;
     }
 }

@@ -10,6 +10,11 @@ use App\Application\Command\RegisterVehicleCommand;
 use App\Application\Command\RegisterVehicleCommandHandler;
 use App\Application\Query\FindFleetQuery;
 use App\Application\Query\FindFleetQueryHandler;
+use App\Application\Query\FindVehicleByPlateNumberQuery;
+use App\Application\Query\FindVehicleByPlateNumberQueryHandler;
+use App\Domain\Exception\MissingResourceException;
+use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use App\Domain\Model\Vehicle;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,13 +27,18 @@ use function is_string;
 class FleetRegisterVehicleConsoleCommand extends Command
 {
     /**
-     * @var positive-int|null
+     * @var positive-int
      */
     private int|null $fleetId = null;
+
+    /**
+     * @var non-empty-string|null
+     */
     private string|null $vehiclePlateNumber = null;
 
     public function __construct(
         private readonly FindFleetQueryHandler $findFleetQueryHandler,
+        private readonly FindVehicleByPlateNumberQueryHandler $findVehicleByPlateNumber,
         private readonly CreateVehicleCommandHandler $createVehicleCommandHandler,
         private readonly RegisterVehicleCommandHandler $registerVehicleCommandHandler,
     ) {
@@ -47,7 +57,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
                 'vehiclePlateNumber',
                 InputArgument::REQUIRED,
                 'The plate number of the vehicle.'
-            );
+            )
         ;
     }
 
@@ -79,29 +89,54 @@ class FleetRegisterVehicleConsoleCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ): int {
-
         if (!$this->fleetId || !$this->vehiclePlateNumber) {
             return Command::INVALID;
         }
 
-        $query = new FindFleetQuery($this->fleetId);
-        $fleet = ($this->findFleetQueryHandler)($query);
+        try {
+            $query = new FindFleetQuery($this->fleetId);
+            $fleet = ($this->findFleetQueryHandler)($query);
+        } catch (MissingResourceException $exception) {
+            $output->writeln(
+                sprintf('<fg=yellow>"%s"</>', $exception->getMessage())
+            );
 
-        $command = new CreateVehicleCommand($this->vehiclePlateNumber);
-        $vehicle = ($this->createVehicleCommandHandler)($command);
+            return Command::INVALID;
+        }
 
-        $command = new RegisterVehicleCommand(
-            fleet: $fleet,
-            vehicle: $vehicle,
-        );
-        ($this->registerVehicleCommandHandler)($command);
+        $vehicle = $this->getVehicle();
+
+        try {
+            $command = new RegisterVehicleCommand(
+                fleet: $fleet,
+                vehicle: $vehicle,
+            );
+            ($this->registerVehicleCommandHandler)($command);
+        } catch (VehicleAlreadyRegisteredException $exception) {
+            $output->writeln(
+                sprintf('<fg=yellow>"%s"</>', $exception->getMessage())
+            );
+
+            return Command::FAILURE;
+        }
 
         $output->writeln('<fg=green>Vehicle successfully registered.</>');
 
         return Command::SUCCESS;
+    }
 
-        // or return this if some error happened during the execution
-        // (it's equivalent to returning int(1))
-        // return Command::FAILURE;
+    private function getVehicle(): Vehicle
+    {
+        try {
+            //@phpstan-ignore argument.type (Cannot be null at this point)
+            $query = new FindVehicleByPlateNumberQuery($this->vehiclePlateNumber);
+            $vehicle = ($this->findVehicleByPlateNumber)($query);
+        } catch (MissingResourceException) {
+            //@phpstan-ignore argument.type (Cannot be null at this point)
+            $command = new CreateVehicleCommand($this->vehiclePlateNumber);
+            $vehicle = ($this->createVehicleCommandHandler)($command);
+        }
+
+        return $vehicle;
     }
 }

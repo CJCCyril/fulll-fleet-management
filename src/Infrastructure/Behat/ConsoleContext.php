@@ -18,7 +18,8 @@ final class ConsoleContext implements Context
 {
     use DatabaseContextTrait;
 
-    private string $output;
+    private string $output = '';
+    private string $errorOutput = '';
 
     /**
      * @Given I run console command :command
@@ -34,6 +35,7 @@ final class ConsoleContext implements Context
         $process->run();
 
         $this->output = $process->getOutput();
+        $this->errorOutput = $process->getErrorOutput();
     }
 
     /**
@@ -46,13 +48,17 @@ final class ConsoleContext implements Context
             !str_contains(
                 $this->output,
                 (string) $expectedOutput,
+            ) &&
+            !str_contains(
+                $this->errorOutput,
+                (string) $expectedOutput,
             )
         ) {
             throw new Exception(
                 sprintf(
                     'Expected output to contain "%s", but got "%s"',
                     $expectedOutput,
-                    $this->output
+                    $this->output . $this->errorOutput,
                 )
             );
         }
