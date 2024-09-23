@@ -17,11 +17,19 @@ Feature: Execute fleet:register-vehicle command
     Parameter "fleetId" must be a positive integer.
     """
 
-  Scenario: Execute with invalid plate number
+  Scenario: Execute with an empty plate number
     Given I run console command "fleet:register-vehicle 1"
     Then the output should contain:
     """
     Parameter "vehiclePlateNumber" must be a non empty string.
+    """
+
+  Scenario: Execute with an invalid plate number
+    Given I run console command "fleet:create JohnDoe"
+    When I run console command "fleet:register-vehicle 1 test"
+    Then the output should contain:
+    """
+    "test" is not a valid vehicle plate number.
     """
 
   Scenario: Execute with a non existing fleet

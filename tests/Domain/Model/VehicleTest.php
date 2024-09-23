@@ -4,6 +4,7 @@ namespace App\Tests\Domain\Model;
 
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use App\Domain\Exception\VehicleInvalidPlateNumberException;
 use App\Domain\Model\Fleet;
 use App\Domain\Model\Location;
 use App\Domain\Model\Vehicle;
@@ -138,5 +139,13 @@ final class VehicleTest extends TestCase
         self::expectExceptionMessage($message);
 
         $this->vehicle->park($location);
+    }
+
+    public function testItThrowsVehicleInvalidPlateNumberException(): void
+    {
+        self::expectException(VehicleInvalidPlateNumberException::class);
+        self::expectExceptionMessage('"test" is not a valid vehicle plate number.');
+
+        new Vehicle('test');
     }
 }

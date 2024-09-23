@@ -12,6 +12,7 @@ use App\Application\Query\FindVehicleByPlateNumberQuery;
 use App\Application\Query\QueryBusInterface;
 use App\Domain\Exception\MissingResourceException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use App\Domain\Exception\VehicleInvalidPlateNumberException;
 use App\Domain\Model\Vehicle;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -102,6 +103,19 @@ class FleetRegisterVehicleConsoleCommand extends Command
 
         $vehicle = $this->getVehicle();
 
+        if (!$vehicle) {
+            try {
+                $command = new CreateVehicleCommand($this->vehiclePlateNumber);
+                $vehicle = $this->commandBus->dispatch($command);
+            } catch (VehicleInvalidPlateNumberException $exception) {
+                $output->writeln(
+                    sprintf('<fg=yellow>"%s"</>', $exception->getMessage())
+                );
+
+                return Command::INVALID;
+            }
+        }
+
         try {
             $command = new RegisterVehicleCommand(
                 fleet: $fleet,
@@ -121,16 +135,14 @@ class FleetRegisterVehicleConsoleCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function getVehicle(): Vehicle
+    private function getVehicle(): Vehicle|null
     {
         try {
             //@phpstan-ignore argument.type (Cannot be null at this point)
             $query = new FindVehicleByPlateNumberQuery($this->vehiclePlateNumber);
             $vehicle = $this->queryBus->ask($query);
         } catch (MissingResourceException) {
-            //@phpstan-ignore argument.type (Cannot be null at this point)
-            $command = new CreateVehicleCommand($this->vehiclePlateNumber);
-            $vehicle = $this->commandBus->dispatch($command);
+            return  null;
         }
 
         return $vehicle;

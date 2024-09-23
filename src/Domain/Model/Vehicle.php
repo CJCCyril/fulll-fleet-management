@@ -6,6 +6,7 @@ namespace App\Domain\Model;
 
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
+use App\Domain\Exception\VehicleInvalidPlateNumberException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,6 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 final class Vehicle implements Identifiable
 {
     use IdentifiableTrait;
+
+    //Only support french plate number
+    private const string PLATE_NUMBER_REGEX = '/^[A-Z]{2}-\d{3}-[A-Z]{2}$/';
 
     /**
      * @var non-empty-string
@@ -42,6 +46,9 @@ final class Vehicle implements Identifiable
         string $plateNumber,
     ) {
         $this->plateNumber = $plateNumber;
+
+        $this->validate();
+
         $this->fleets = new ArrayCollection();
     }
 
@@ -88,5 +95,12 @@ final class Vehicle implements Identifiable
         $this->location = $location;
 
         return $this;
+    }
+
+    private function validate(): void
+    {
+        if (!preg_match(self::PLATE_NUMBER_REGEX, $this->plateNumber)) {
+            throw new VehicleInvalidPlateNumberException($this->plateNumber);
+        }
     }
 }
