@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Query;
 
-final readonly class FindVehicleQuery
+use App\Domain\Model\Vehicle;
+
+/**
+ * @implements QueryInterface<Vehicle>
+ */
+final readonly class FindVehicleQuery implements QueryInterface
 {
     /**
      * @param positive-int $id

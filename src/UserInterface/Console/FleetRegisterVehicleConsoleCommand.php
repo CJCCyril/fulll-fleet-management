@@ -8,9 +8,8 @@ use App\Application\Command\CommandBusInterface;
 use App\Application\Command\CreateVehicleCommand;
 use App\Application\Command\RegisterVehicleCommand;
 use App\Application\Query\FindFleetQuery;
-use App\Application\Query\FindFleetQueryHandler;
 use App\Application\Query\FindVehicleByPlateNumberQuery;
-use App\Application\Query\FindVehicleByPlateNumberQueryHandler;
+use App\Application\Query\QueryBusInterface;
 use App\Domain\Exception\MissingResourceException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
 use App\Domain\Model\Vehicle;
@@ -37,8 +36,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
 
     public function __construct(
         private readonly CommandBusInterface $commandBus,
-        private readonly FindFleetQueryHandler $findFleetQueryHandler,
-        private readonly FindVehicleByPlateNumberQueryHandler $findVehicleByPlateNumber,
+        private readonly QueryBusInterface $queryBus,
     ) {
         parent::__construct();
     }
@@ -93,7 +91,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
 
         try {
             $query = new FindFleetQuery($this->fleetId);
-            $fleet = ($this->findFleetQueryHandler)($query);
+            $fleet = $this->queryBus->ask($query);
         } catch (MissingResourceException $exception) {
             $output->writeln(
                 sprintf('<fg=yellow>"%s"</>', $exception->getMessage())
@@ -128,7 +126,7 @@ class FleetRegisterVehicleConsoleCommand extends Command
         try {
             //@phpstan-ignore argument.type (Cannot be null at this point)
             $query = new FindVehicleByPlateNumberQuery($this->vehiclePlateNumber);
-            $vehicle = ($this->findVehicleByPlateNumber)($query);
+            $vehicle = $this->queryBus->ask($query);
         } catch (MissingResourceException) {
             //@phpstan-ignore argument.type (Cannot be null at this point)
             $command = new CreateVehicleCommand($this->vehiclePlateNumber);

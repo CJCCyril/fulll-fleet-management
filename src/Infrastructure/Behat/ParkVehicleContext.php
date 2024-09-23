@@ -7,7 +7,7 @@ namespace App\Infrastructure\Behat;
 use App\Application\Command\CommandBusInterface;
 use App\Application\Command\ParkVehicleCommand;
 use App\Application\Query\FindVehicleQuery;
-use App\Application\Query\FindVehicleQueryHandler;
+use App\Application\Query\QueryBusInterface;
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Infrastructure\Behat\Trait\DatabaseContextTrait;
 use App\Infrastructure\Behat\Trait\ExceptionContextTrait;
@@ -29,7 +29,7 @@ final class ParkVehicleContext implements Context
 
     public function __construct(
         private readonly CommandBusInterface $commandBus,
-        private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
+        private readonly QueryBusInterface $queryBus,
     ) {
     }
 
@@ -54,7 +54,7 @@ final class ParkVehicleContext implements Context
     {
         $query = new FindVehicleQuery($this->currentVehicle->getId());
 
-        $vehicle = ($this->findVehicleQueryHandler)($query);
+        $vehicle = $this->queryBus->ask($query);
 
         Assert::assertEquals(
             $this->currentLocation,

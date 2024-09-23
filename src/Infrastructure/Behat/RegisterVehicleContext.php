@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Infrastructure\Behat;
 
 use App\Application\Command\CommandBusInterface;
-use App\Application\Command\CreateFleetCommandHandler;
-use App\Application\Command\CreateVehicleCommandHandler;
-use App\Application\Command\RegisterVehicleCommandHandler;
 use App\Application\Query\FindVehicleQuery;
-use App\Application\Query\FindVehicleQueryHandler;
+use App\Application\Query\QueryBusInterface;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
 use App\Infrastructure\Behat\Trait\DatabaseContextTrait;
 use App\Infrastructure\Behat\Trait\ExceptionContextTrait;
@@ -29,7 +26,7 @@ final class RegisterVehicleContext implements Context
 
     public function __construct(
         private readonly CommandBusInterface $commandBus,
-        private readonly FindVehicleQueryHandler $findVehicleQueryHandler,
+        private readonly QueryBusInterface $queryBus,
     ) {
     }
 
@@ -40,7 +37,7 @@ final class RegisterVehicleContext implements Context
     {
         $query = new FindVehicleQuery($this->currentVehicle->getId());
 
-        $vehicle = ($this->findVehicleQueryHandler)($query);
+        $vehicle = $this->queryBus->ask($query);
 
         Assert::assertContains(
             $this->currentFleet,

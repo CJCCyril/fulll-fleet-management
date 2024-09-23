@@ -8,7 +8,7 @@ use App\Domain\Exception\MissingResourceException;
 use App\Domain\Model\Fleet;
 use App\Domain\Repository\FleetRepository;
 
-final readonly class FindFleetQueryHandler
+final readonly class FindFleetQueryHandler implements AsQueryHandler
 {
     public function __construct(
         private FleetRepository $fleetRepository

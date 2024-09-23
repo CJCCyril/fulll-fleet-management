@@ -20,6 +20,15 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    _instanceof:
+        App\Application\Command\AsCommandHandler:
+            tags:
+                - { name: messenger.message_handler, bus: command.bus }
+
+        App\Application\Query\AsQueryHandler:
+            tags:
+                - { name: messenger.message_handler, bus: query.bus }
+
     App\Domain\Repository\FleetRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineFleetRepository'
     App\Domain\Repository\VehicleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineVehicleRepository'
     App\Domain\Repository\LocationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineLocationRepository'

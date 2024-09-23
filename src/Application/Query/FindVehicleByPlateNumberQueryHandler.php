@@ -8,7 +8,7 @@ use App\Domain\Exception\MissingResourceException;
 use App\Domain\Model\Vehicle;
 use App\Domain\Repository\VehicleRepository;
 
-final readonly class FindVehicleByPlateNumberQueryHandler
+final readonly class FindVehicleByPlateNumberQueryHandler implements AsQueryHandler
 {
     public function __construct(
         private VehicleRepository $vehicleRepository

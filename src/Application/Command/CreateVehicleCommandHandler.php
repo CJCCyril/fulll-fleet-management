@@ -6,10 +6,8 @@ namespace App\Application\Command;
 
 use App\Domain\Model\Vehicle;
 use App\Domain\Repository\VehicleRepository;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
-final readonly class CreateVehicleCommandHandler
+final readonly class CreateVehicleCommandHandler implements AsCommandHandler
 {
     public function __construct(
         private VehicleRepository $vehicleRepository,
