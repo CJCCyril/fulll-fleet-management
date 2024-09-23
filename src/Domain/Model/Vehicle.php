@@ -6,11 +6,8 @@ namespace App\Domain\Model;
 
 use App\Domain\Exception\VehicleAlreadyParkedAtLocationException;
 use App\Domain\Exception\VehicleAlreadyRegisteredException;
-use ArrayAccess;
-use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Traversable;
 
 #[ORM\Entity]
 final class Vehicle implements Identifiable

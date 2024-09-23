@@ -6,6 +6,8 @@ namespace App\UserInterface\Console;
 
 use App\Application\Command\CreateFleetCommand;
 use App\Application\Command\CreateFleetCommandHandler;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +24,7 @@ class FleetCreateConsoleCommand extends Command
 
     public function __construct(
         private readonly CreateFleetCommandHandler $createFleetCommandHandler,
+        private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
     }
@@ -59,7 +62,18 @@ class FleetCreateConsoleCommand extends Command
 
         $command = new CreateFleetCommand($this->userId);
 
-        $fleet = ($this->createFleetCommandHandler)($command);
+        try {
+            $fleet = ($this->createFleetCommandHandler)($command);
+        } catch (UniqueConstraintViolationException $exception) {
+            $output->writeln('<fg=red>Fleet already exist.</>');
+
+            $this->logger->error('fleet:create:failure', [
+                'messsage' => $exception->getMessage(),
+                //...
+            ]);
+
+            return Command::FAILURE;
+        }
 
         $output->writeln('<fg=green>Fleet created.</>');
 
@@ -70,9 +84,5 @@ class FleetCreateConsoleCommand extends Command
         $output->writeln($fleetIdMessage);
 
         return Command::SUCCESS;
-
-        // or return this if some error happened during the execution
-        // (it's equivalent to returning int(1))
-        // return Command::FAILURE;
     }
 }

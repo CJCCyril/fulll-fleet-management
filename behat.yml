@@ -10,6 +10,11 @@ default:
         - App\Infrastructure\Behat\ParkVehicleContext
       paths:
         - tests/Behat/Vehicle/park_vehicle.feature
+    console:
+      contexts:
+        - App\Infrastructure\Behat\ConsoleContext
+      paths:
+        - tests/Behat/Console/
   extensions:
     FriendsOfBehat\SymfonyExtension:
       bootstrap: tests/bootstrap.php
